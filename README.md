@@ -108,8 +108,6 @@ builds a SQL statement as follows (this example shows a postgresql statement):
 ("tables"."c1" ILIKE '%a%' OR "tables"."c2" ILIKE '%a%') AND ("tables"."c1" ILIKE '%b%' OR "tables"."c2" ILIKE '%b%')
 ```
 
-For more examples, see [spec/logical_query_parser/active_record_spec.rb](spec/logical_query_parser/active_record_spec.rb).
-
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
