@@ -1,3 +1,3 @@
-class LogicalQueryParser < Treetop::Runtime::CompiledParser
+module LogicalQuery
   VERSION = "0.1.0"
 end

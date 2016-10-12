@@ -1,12 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'treetop'
 require 'logical_query_parser/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "logical_query_parser"
-  spec.version       = LogicalQueryParser::VERSION
+  spec.version       = LogicalQuery::VERSION
   spec.authors       = ["Yoshikazu Kaneta"]
   spec.email         = ["kaneta@sitebridge.co.jp"]
 
