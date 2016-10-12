@@ -1,0 +1,62 @@
+grammar LogicalQuery
+  rule exp
+    any:(cond / exp_paren / literal_seq / literal) <ExpNode>
+  end
+
+  rule exp_paren
+    lparen sp* exp sp* rparen <ExpParenNode>
+  end
+
+  rule cond
+    lexp:(exp_paren / literal) sp+ logic:(land / lor) sp+ rexp:exp <CondNode>
+  end
+
+  rule literal_seq
+    lliteral:literal sp+ rliteral:(literal_seq / literal) <LiteralSeqNode>
+  end
+
+  rule literal
+    negative:negative* word <LiteralNode>
+  end
+
+  rule word
+    (quoted_word / unquoted_word) <WordNode>
+  end
+
+  rule quoted_word
+    '"' ('\"' / !'"' .)* '"'
+  end
+
+  rule unquoted_word
+    atom+
+  end
+
+  rule land
+    ('AND' / 'and') <AndNode>
+  end
+
+  rule lor
+    ('OR' / 'or') <OrNode>
+  end
+
+  rule lparen
+    '(' <LParenNode>
+  end
+
+  rule rparen
+    ')' <RParenNode>
+  end
+
+  rule negative
+    ('-' / '-' / '－') <NegativeNode>
+  end
+
+  rule sp
+    ' ' / '　'
+  end
+
+  rule atom
+    !(lparen / rparen / negative / sp) .
+  end
+end
+
