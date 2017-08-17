@@ -32,11 +32,11 @@ grammar LogicalQuery
   end
 
   rule land
-    ('AND' / 'and') <AndNode>
+    ('AND' / 'and' / '&') <AndNode>
   end
 
   rule lor
-    ('OR' / 'or') <OrNode>
+    ('OR' / 'or' / '|') <OrNode>
   end
 
   rule lparen

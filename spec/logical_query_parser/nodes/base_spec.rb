@@ -31,29 +31,43 @@ describe 'LogicalQueryParser::Base' do
     expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
   end
 
-  it 'parses AND operation' do
-    result = @parser.parse("aa AND bb")
-    expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
+  [' AND ', '&', ' & ', ' OR ', '|', ' | '].each do |land|
+    context "parses '#{land}' "  do
+      it 'operation' do
+        result = @parser.parse("aa#{land}bb")
+        expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
+      end
+
+      it 'operations' do
+        result = @parser.parse("aa#{land}bb#{land}cc")
+        expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
+      end
+
+      it 'operation with parentheses' do
+        result = @parser.parse("(aa#{land}bb)")
+        expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
+      end
+    end
   end
 
-  it 'parses AND operations' do
-    result = @parser.parse("aa AND bb AND cc")
-    expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
-  end
+  [
+    [' OR ', ' AND '],
+    [' | ', ' & '],
+    ['|', '&']
+  ].each do |l1, l2|
 
-  it 'parses AND operation with parentheses' do
-    result = @parser.parse("(aa AND bb)")
-    expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
-  end
+    context "parses '#{l1}' and '#{l2}' operations" do
+      it '(1)' do
+        result = @parser.parse("(aa#{l1}bb)#{l2}cc")
+        expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
+      end
 
-  it 'parses AND and OR operations (1)' do
-    result = @parser.parse("(aa OR bb) AND cc")
-    expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
-  end
+      it '(2)' do
+        result = @parser.parse("aa#{l1}(bb#{l2}cc)")
+        expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
+      end
+    end
 
-  it 'parses AND and OR operations (2)' do
-    result = @parser.parse("aa AND (bb OR cc)")
-    expect(result).to be_a_kind_of Treetop::Runtime::SyntaxNode
   end
 
   it 'parses complex operations (1)' do
