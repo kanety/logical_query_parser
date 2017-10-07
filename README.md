@@ -2,7 +2,7 @@
 
 A parser to generate a tree structure from a logical search query string using treetop.
 
-## Requirements
+## Dependencies
 
 * ruby 2.3+
 * treetop 1.6+
@@ -31,14 +31,8 @@ You can parse a logical query string as follows:
 ```ruby
 parser = LogicalQueryParser.new
 parser.parse('a AND b')
-```
 
-Return value is a syntax tree of treetop:
-
-```ruby
-parser = LogicalQueryParser.new
-parser.parse('a AND b')
-
+# return value is a syntax tree of treetop
 => SyntaxNode+Exp0+ExpNode offset=0, "a AND b" (any):
   SyntaxNode+Cond0+CondNode offset=0, "a AND b" (lexp,logic,rexp):
     SyntaxNode+Literal0+LiteralNode offset=0, "a" (word,negative):
@@ -72,16 +66,14 @@ You can also parse negative conditions:
 
 ```
 parser = LogicalQueryParser.new
-parser.parse('("a a" AND -"b b") OR (c AND -d)')
+parser.parse('("a a" AND NOT "b b") OR (c AND -d)')
 ```
 
 ### Supported operators
 
-You can parse a query string with following operators:
-
-* AND / and: represents an AND logic.
-* OR / or: represents an OR logic.
-* \-: represents a NOT logic. This should precede to a word.
+* AND / and / &: represents an AND logic.
+* OR / or / |: represents an OR logic.
+* NOT / \-: represents a NOT logic. This should precede to a word or a parenthesis.
 * (: represents beginning of a nested expression.
 * ): represents end of a nested expression.
 * ": represents beginning or end of a quoted word.

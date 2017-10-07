@@ -2,13 +2,13 @@ module LogicalQuery
   module ExpNode
   end
 
-  module ExpParenNode
+  module ParenExpNode
   end
 
-  module CondNode
+  module LogicExpNode
   end
 
-  module LiteralSeqNode
+  module LiteralExpNode
   end
 
   module LiteralNode
@@ -23,12 +23,12 @@ module LogicalQuery
   module OrNode
   end
 
+  module NotNode
+  end
+
   module LParenNode
   end
 
   module RParenNode
-  end
-
-  module NegativeNode
   end
 end
