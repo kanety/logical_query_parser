@@ -1,23 +1,39 @@
 module LogicalQuery
   module ExpNode
     def to_sql(opts = {}, sql = '')
-      any.to_sql(opts, sql)
+      exp.to_sql(opts, sql)
     end
   end
 
-  module ExpParenNode
+  module ParenExpNode
     def to_sql(opts, sql = '')
+      if negative.elements.size > 0
+        negative.elements[0].to_sql(opts, sql)
+      end
       lparen.to_sql(opts, sql)
       exp.to_sql(opts, sql)
       rparen.to_sql(opts, sql)
+      if rexp.elements.size > 0
+        sql += ' AND '
+        rexp.elements[0].to_sql(opts, sql)
+      end
+      sql
     end
   end
 
-  module CondNode
+  module LogicExpNode
     def to_sql(opts, sql = '')
       lexp.to_sql(opts, sql)
       logic.to_sql(opts, sql)
       rexp.to_sql(opts, sql)
+    end
+  end
+
+  module LiteralExpNode
+    def to_sql(opts, sql = '')
+      literal.to_sql(opts, sql)
+      sql << ' AND '
+      exp.to_sql(opts, sql)
     end
   end
 
@@ -45,11 +61,9 @@ module LogicalQuery
     end
   end
 
-  module LiteralSeqNode
+  module NotNode
     def to_sql(opts, sql = '')
-      lliteral.to_sql(opts, sql)
-      sql << ' AND '
-      rliteral.to_sql(opts, sql)
+      sql << 'NOT '
     end
   end
 
@@ -58,9 +72,10 @@ module LogicalQuery
       operator, logic = negative.elements.size > 0 ? [:does_not_match, :and] : [:matches, :or]
       unquoted = LogicalQuery.unquote(word.text_value)
 
-      arel_table = opts[:model].arel_table
-      relations = opts[:columns].map { |c| arel_table[c].send(operator, "%#{unquoted}%") }.reduce(logic)
-      sql << relations.to_sql
+      arel = opts[:model].arel_table
+      ss = opts[:columns].map { |c| arel[c].send(operator, "%#{unquoted}%") }.reduce(logic).to_sql
+      ss = "(#{ss})" if ss[0] != '(' && ss[-1] != ')'
+      sql << ss
     end
   end
 

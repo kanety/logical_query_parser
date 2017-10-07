@@ -1,22 +1,22 @@
 grammar LogicalQuery
   rule exp
-    any:(cond / exp_paren / literal_seq / literal) <ExpNode>
+    sp* exp:(logic_exp / paren_exp / literal_exp / literal) sp* <ExpNode>
   end
 
-  rule exp_paren
-    lparen sp* exp sp* rparen <ExpParenNode>
+  rule logic_exp
+    lexp:(paren_exp / literal_exp / literal) logic:(and / or) rexp:exp <LogicExpNode>
   end
 
-  rule cond
-    lexp:(exp_paren / literal) sp+ logic:(land / lor) sp+ rexp:exp <CondNode>
+  rule paren_exp
+    negative:not* lparen exp rparen rexp:exp* <ParenExpNode>
   end
 
-  rule literal_seq
-    lliteral:literal sp+ rliteral:(literal_seq / literal) <LiteralSeqNode>
+  rule literal_exp
+    literal sp+ exp <LiteralExpNode>
   end
 
   rule literal
-    negative:negative* word <LiteralNode>
+    negative:not* word <LiteralNode>
   end
 
   rule word
@@ -31,14 +31,6 @@ grammar LogicalQuery
     atom+
   end
 
-  rule land
-    ('AND' / 'and') <AndNode>
-  end
-
-  rule lor
-    ('OR' / 'or') <OrNode>
-  end
-
   rule lparen
     '(' <LParenNode>
   end
@@ -47,8 +39,32 @@ grammar LogicalQuery
     ')' <RParenNode>
   end
 
-  rule negative
-    ('-' / '-' / '－') <NegativeNode>
+  rule and
+    sp+ and_ope sp+ <AndNode>
+  end
+
+  rule or
+    sp+ or_ope sp+ <OrNode>
+  end
+
+  rule not
+    (not_ope sp+ / not_sym sp*) <NotNode>
+  end
+
+  rule and_ope
+    'AND' / 'and' / '&&' / '&'
+  end
+
+  rule or_ope
+    'OR' / 'or' / '||' / '|'
+  end
+
+  rule not_ope
+    'NOT' / 'not'
+  end
+
+  rule not_sym
+    '-' / '-' / '－'
   end
 
   rule sp
@@ -56,7 +72,6 @@ grammar LogicalQuery
   end
 
   rule atom
-    !(lparen / rparen / negative / sp) .
+    !(lparen / rparen /and_ope / or_ope / not_ope / not_sym / sp) .
   end
 end
-
