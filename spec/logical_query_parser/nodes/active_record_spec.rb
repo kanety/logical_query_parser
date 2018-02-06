@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'active_record_helper'
 require 'logical_query_parser/nodes/active_record'
 
-describe LogicalQueryParser::ActiveRecord do
+describe LogicalQueryParser do
   let(:parser) { LogicalQueryParser.new }
   let(:opts) { { model: Doc, columns: %w(title body) } }
 
