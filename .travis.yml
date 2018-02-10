@@ -1,12 +1,12 @@
 sudo: false
 language: ruby
 rvm:
-  - 2.3.4
-  - 2.4.1
+  - 2.3
+  - 2.4
+  - 2.5
 gemfile:
   - gemfiles/rails42.gemfile
   - gemfiles/rails50.gemfile
   - gemfiles/rails51.gemfile
-before_install:
-  - gem install bundler -v 1.15.3
+  - gemfiles/rails52.gemfile
 script: bundle exec rspec
