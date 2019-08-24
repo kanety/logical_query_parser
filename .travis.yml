@@ -10,4 +10,12 @@ gemfile:
   - gemfiles/rails50.gemfile
   - gemfiles/rails51.gemfile
   - gemfiles/rails52.gemfile
-script: bundle exec rspec
+  - gemfiles/rails60.gemfile
+matrix:
+  exclude:
+  - rvm: 2.3
+    gemfile: gemfiles/rails60.gemfile
+  - rvm: 2.4
+    gemfile: gemfiles/rails60.gemfile
+script:
+  - bundle exec rspec
