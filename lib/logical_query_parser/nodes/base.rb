@@ -1,4 +1,4 @@
-module LogicalQuery
+module LogicalQueryParser
   module ExpNode
   end
 

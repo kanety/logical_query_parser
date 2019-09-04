@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe LogicalQueryParser do
   it 'has a version number' do
-    expect(LogicalQuery::VERSION).not_to be nil
+    expect(LogicalQueryParser::VERSION).not_to be nil
   end
 
   it 'walks on tree' do

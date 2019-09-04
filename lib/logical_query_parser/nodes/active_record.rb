@@ -1,4 +1,4 @@
-module LogicalQuery
+module LogicalQueryParser
   module ExpNode
     def to_sql(opts = {}, sql = '')
       exp.to_sql(opts, sql)
@@ -70,7 +70,7 @@ module LogicalQuery
   module LiteralNode
     def to_sql(opts, sql = '')
       operator, logic = negative.elements.size > 0 ? [:does_not_match, :and] : [:matches, :or]
-      unquoted = LogicalQuery.unquote(word.text_value)
+      unquoted = LogicalQueryParser.unquote(word.text_value)
 
       arel = opts[:model].arel_table
       ss = opts[:columns].map { |c| arel[c].send(operator, "%#{unquoted}%") }.reduce(logic).to_sql

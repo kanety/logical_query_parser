@@ -1,4 +1,4 @@
-grammar LogicalQuery
+grammar LogicalQueryParser
   rule exp
     sp* exp:(logic_exp / paren_exp / literal_exp / literal) sp* <ExpNode>
   end
