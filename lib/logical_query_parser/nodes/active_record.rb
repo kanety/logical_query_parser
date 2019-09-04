@@ -1,81 +1,109 @@
 module LogicalQueryParser
   module ExpNode
-    def to_sql(opts = {}, sql = '')
-      exp.to_sql(opts, sql)
+    def to_sql(params = {})
+      params[:sql] ||= ''
+      exp.to_sql(params)
     end
   end
 
   module ParenExpNode
-    def to_sql(opts, sql = '')
+    def to_sql(params)
       if negative.elements.size > 0
-        negative.elements[0].to_sql(opts, sql)
+        negative.elements[0].to_sql(params)
       end
-      lparen.to_sql(opts, sql)
-      exp.to_sql(opts, sql)
-      rparen.to_sql(opts, sql)
+      lparen.to_sql(params)
+      exp.to_sql(params)
+      rparen.to_sql(params)
       if rexp.elements.size > 0
-        sql += ' AND '
-        rexp.elements[0].to_sql(opts, sql)
+        params[:sql] += ' AND '
+        rexp.elements[0].to_sql(params)
       end
-      sql
+      params[:sql]
     end
   end
 
   module LogicExpNode
-    def to_sql(opts, sql = '')
-      lexp.to_sql(opts, sql)
-      logic.to_sql(opts, sql)
-      rexp.to_sql(opts, sql)
+    def to_sql(params)
+      lexp.to_sql(params)
+      logic.to_sql(params)
+      rexp.to_sql(params)
     end
   end
 
   module LiteralExpNode
-    def to_sql(opts, sql = '')
-      literal.to_sql(opts, sql)
-      sql << ' AND '
-      exp.to_sql(opts, sql)
+    def to_sql(params)
+      literal.to_sql(params)
+      params[:sql] << ' AND '
+      exp.to_sql(params)
     end
   end
 
   module LParenNode
-    def to_sql(opts, sql = '')
-      sql << '('
+    def to_sql(params)
+      params[:sql] << '('
     end
   end
 
   module RParenNode
-    def to_sql(opts, sql = '')
-      sql << ')'
+    def to_sql(params)
+      params[:sql] << ')'
     end
   end
 
   module AndNode
-    def to_sql(opts, sql = '')
-      sql << ' AND '
+    def to_sql(params)
+      params[:sql] << ' AND '
     end
   end
 
   module OrNode
-    def to_sql(opts, sql = '')
-      sql << ' OR '
+    def to_sql(params)
+      params[:sql] << ' OR '
     end
   end
 
   module NotNode
-    def to_sql(opts, sql = '')
-      sql << 'NOT '
+    def to_sql(params)
+      params[:sql] << 'NOT '
     end
   end
 
   module LiteralNode
-    def to_sql(opts, sql = '')
-      operator, logic = negative.elements.size > 0 ? [:does_not_match, :and] : [:matches, :or]
-      unquoted = LogicalQueryParser.unquote(word.text_value)
+    def to_sql(params)
+      operator, logic = operator_and_logic
+      text = LogicalQueryParser.unquote(word.text_value)
+      
+      sql = build_arel(params, operator, text).reduce(logic).to_sql
+      sql = "(#{sql})" if sql[0] != '(' && sql[-1] != ')'
+      params[:sql] << sql
+    end
 
-      arel = opts[:model].arel_table
-      ss = opts[:columns].map { |c| arel[c].send(operator, "%#{unquoted}%") }.reduce(logic).to_sql
-      ss = "(#{ss})" if ss[0] != '(' && ss[-1] != ')'
-      sql << ss
+    private
+
+    def operator_and_logic
+      if negative.elements.size > 0
+        return :does_not_match, :and
+      else
+        return :matches, :or
+      end
+    end
+
+    def build_arel(params, operator, text)
+      if params[:columns].is_a?(Hash)
+        build_arel_from_hash(params[:model], params[:columns], operator, text)
+      else
+        build_arel_from_columns(params[:model], params[:columns], operator, text)
+      end
+    end
+    
+    def build_arel_from_columns(klass, columns, operator, text)
+      columns.map { |column| klass.arel_table[column].send(operator, "%#{text}%") }
+    end
+
+    def build_arel_from_hash(klass, hash, operator, text)
+      hash.flat_map do |klass, columns|
+        build_arel_from_columns(klass, columns, operator, text)
+      end
     end
   end
 
