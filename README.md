@@ -79,36 +79,41 @@ parser.parse('("a a" AND NOT "b b") OR (c AND -d)')
 * ": represents beginning or end of a quoted word.
 * Space: represents a boundary between two words.
 
-For more information, see [grammar definition](lib/logical_query.treetop).
+For more information, see [grammar definition](lib/logical_query_parser.treetop).
 
-### Compile into SQL
+### Use with ActiveRecord
 
-You can compile a syntax tree into a SQL statement by using activerecord model. For example, the code below
+You can use a syntax tree to compile a SQL statement for activerecord. For example:
 
 ```ruby
-class Table < ActiveRecord::Base
-  def build_sql(str = "a AND b")
-    parser = LogicalQueryParser.new
-    parser.parse(str).to_sql(model: self, columns: %w(c1 c2))
-  end
+class Doc < ActiveRecord::Base
 end
+
+LogicalQueryParser.search("a AND b", Doc.all, :c1, :c2).to_sql
+# SELECT "docs".* FROM "docs"
+#  WHERE (("docs"."c1" LIKE '%a%' OR "docs"."c2" LIKE '%a%') AND ("docs"."c1" LIKE '%b%' OR "docs"."c2" LIKE '%b%'))
 ```
 
-builds a SQL statement as follows (this example shows a postgresql statement):
+Use with associations:
 
-```sql
-("tables"."c1" ILIKE '%a%' OR "tables"."c2" ILIKE '%a%') AND ("tables"."c1" ILIKE '%b%' OR "tables"."c2" ILIKE '%b%')
+```ruby
+class Doc < ActiveRecord::Base
+  has_many :tags
+end
+
+class Tag < ActiveRecord::Base
+end
+
+LogicalQueryParser.search("a AND b", Doc.all, :c1, :c2, tags: [:c3]).to_sql
+# SELECT "docs".* FROM "docs"
+#  INNER JOIN "tags" ON "tags"."doc_id" = "docs"."id"
+#  WHERE ((("docs"."c1" LIKE '%a%' OR "docs"."c2" LIKE '%a%') OR "tags"."c3" LIKE '%a%') AND
+#        (("docs"."c1" LIKE '%b%' OR "docs"."c2" LIKE '%b%') OR "tags"."c3" LIKE '%b%'))
 ```
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/kanety/logical_query_parser. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/kanety/logical_query_parser.
 
 ## License
 
