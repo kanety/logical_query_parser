@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.1
+
+* Fix to support array of columns.
+
 ## 0.3.0
 
 * Support searching with associations.
