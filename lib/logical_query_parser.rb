@@ -14,13 +14,13 @@ module LogicalQueryParser
 
     def search(query, relations, *options)
       relations = relations.all if relations.respond_to?(:all)
-      assoc = resolve_assocs(relations.klass, options)
+      assoc = resolve_assocs(relations.klass, *options)
       sql = new.parse(query).to_sql(model: relations.klass, columns: assoc.column_mapping)
       relations.joins(assoc.structure).where(sql)
     end
 
-    def resolve_assocs(klass, options)
-      AssocResolver.new(klass).run(options)
+    def resolve_assocs(klass, *options)
+      AssocResolver.new(klass).run(*options)
     end
 
     def walk_tree(node, &block)

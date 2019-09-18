@@ -169,5 +169,12 @@ describe LogicalQueryParser do
       expect(relations.to_sql).to match sequence %W|( ( title aa OR tags name aa OR users name aa ) AND ( title bb OR tags name bb OR users name bb )|
       expect(relations.to_a).not_to be_nil
     end
+
+    it 'searches nested association with array' do
+      relations = LogicalQueryParser.search("aa AND bb", Doc, [:title, tags: [:name, users: :name]])
+      debug(relations.to_sql)
+      expect(relations.to_sql).to match sequence %W|( ( title aa OR tags name aa OR users name aa ) AND ( title bb OR tags name bb OR users name bb )|
+      expect(relations.to_a).not_to be_nil
+    end
   end
 end
