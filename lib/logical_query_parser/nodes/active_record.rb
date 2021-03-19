@@ -97,7 +97,7 @@ module LogicalQueryParser
     end
     
     def build_arel_from_columns(klass, columns, operator, text)
-      columns.map { |column| klass.arel_table[column].send(operator, "%#{text}%") }
+      columns.map { |column| klass.arel_table[column].send(operator, Arel.sql(klass.connection.quote("%#{text}%"))) }
     end
 
     def build_arel_from_hash(klass, hash, operator, text)
