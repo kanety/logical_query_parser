@@ -1,5 +1,9 @@
 # CHANGELOG
 
+# 0.3.2
+
+* Force text search for activerecord's serialized column.
+
 ## 0.3.1
 
 * Fix to support array of columns.
