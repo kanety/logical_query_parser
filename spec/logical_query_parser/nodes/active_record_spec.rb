@@ -24,7 +24,7 @@ describe LogicalQueryParser do
     it 'parses quoted words' do
       result = parser.parse('"aa bb"').to_sql(options)
       debug(result)
-      expect(result).to match sequence %w|title aa bb OR body aa bb|
+      expect(result).to match sequence %w|title aa\ bb OR body aa\ bb|
       expect(Doc.where(result).to_a).not_to be_nil
     end
   end
@@ -48,14 +48,14 @@ describe LogicalQueryParser do
       it 'before parenthesis (1)' do
         result = parser.parse("#{ope}(aa OR bb)").to_sql(options)
         debug(result)
-        expect(result).to match sequence %w|NOT ( title aa OR body aa OR title bb OR body bb )|
+        expect(result).to match sequence %w|NOT ( ( title aa OR body aa ) OR ( title bb OR body bb ) )|
         expect(Doc.where(result).to_a).not_to be_nil
       end
 
       it 'before parenthesis (2)' do
         result = parser.parse("(aa OR bb) AND #{ope}(cc OR dd)").to_sql(options)
         debug(result)
-        expect(result).to match sequence %w|( title aa OR body aa OR title bb OR body bb ) AND NOT ( title cc OR body cc OR title dd OR body dd )|
+        expect(result).to match sequence %w|( ( title aa OR body aa ) OR ( title bb OR body bb ) ) AND NOT ( ( title cc OR body cc ) OR ( title dd OR body dd ) )|
         expect(Doc.where(result).to_a).not_to be_nil
       end
     end
@@ -85,28 +85,28 @@ describe LogicalQueryParser do
     it 'parses (1)' do
       result = parser.parse("(aa OR bb) AND cc").to_sql(options)
       debug(result)
-      expect(result).to match sequence %W|( title aa OR body aa ) OR ( title bb OR body bb ) AND ( title cc OR body cc )|
+      expect(result).to match sequence %W|( ( title aa OR body aa ) OR ( title bb OR body bb ) ) AND ( title cc OR body cc )|
       expect(Doc.where(result).to_a).not_to be_nil
     end
 
     it 'parses (2)' do
       result = parser.parse("aa AND (bb OR cc)").to_sql(options)
       debug(result)
-      expect(result).to match sequence %W|( title aa OR body aa ) AND ( title bb OR body bb ) OR ( title cc OR body cc )|
+      expect(result).to match sequence %W|( title aa OR body aa ) AND ( ( title bb OR body bb ) OR ( title cc OR body cc ) )|
       expect(Doc.where(result).to_a).not_to be_nil
     end
 
     it 'parses (3)' do
       result = parser.parse("(aa OR bb) AND (cc OR dd)").to_sql(options)
       debug(result)
-      expect(result).to match sequence %W|( title aa OR body aa ) OR ( title bb OR body bb ) AND ( title cc OR body cc ) OR ( title dd OR body dd )|
+      expect(result).to match sequence %W|( ( title aa OR body aa ) OR ( title bb OR body bb ) ) AND ( ( title cc OR body cc ) OR ( title dd OR body dd ) )|
       expect(Doc.where(result).to_a).not_to be_nil
     end
 
     it 'parses (4)' do
       result = parser.parse('"aa bb" AND NOT "cc dd" AND (ee OR ff)').to_sql(options)
       debug(result)
-      expect(result).to match sequence %W|( title aa bb OR body aa bb ) AND ( title NOT cc dd AND body NOT cc dd ) AND ( ( title ee OR body ee ) OR ( title ff OR body ff ) )|
+      expect(result).to match sequence %W|( title aa\ bb OR body aa\ bb ) AND ( title NOT cc\ dd AND body NOT cc\ dd ) AND ( ( title ee OR body ee ) OR ( title ff OR body ff ) )|
       expect(Doc.where(result).to_a).not_to be_nil
     end
   end
@@ -166,14 +166,14 @@ describe LogicalQueryParser do
     it 'searches nested association' do
       relations = LogicalQueryParser.search("aa AND bb", Doc, :title, tags: [:name, users: :name])
       debug(relations.to_sql)
-      expect(relations.to_sql).to match sequence %W|( ( title aa OR tags name aa OR users name aa ) AND ( title bb OR tags name bb OR users name bb )|
+      expect(relations.to_sql).to match sequence %W|( ( ( title aa OR tags name aa ) OR users name aa ) AND ( ( title bb OR tags name bb ) OR users name bb )|
       expect(relations.to_a).not_to be_nil
     end
 
     it 'searches nested association with array' do
       relations = LogicalQueryParser.search("aa AND bb", Doc, [:title, tags: [:name, users: :name]])
       debug(relations.to_sql)
-      expect(relations.to_sql).to match sequence %W|( ( title aa OR tags name aa OR users name aa ) AND ( title bb OR tags name bb OR users name bb )|
+      expect(relations.to_sql).to match sequence %W|( ( ( title aa OR tags name aa ) OR users name aa ) AND ( ( title bb OR tags name bb ) OR users name bb )|
       expect(relations.to_a).not_to be_nil
     end
   end
