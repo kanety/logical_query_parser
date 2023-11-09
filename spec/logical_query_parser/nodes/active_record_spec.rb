@@ -172,6 +172,12 @@ describe LogicalQueryParser do
     end
 
     it 'returns nil (2)' do
+      result = parser.parse("OR")
+      debug(result)
+      expect(result).to be_nil
+    end
+
+    it 'returns nil (3)' do
       result = parser.parse("NOT AND")
       debug(result)
       expect(result).to be_nil
