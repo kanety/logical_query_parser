@@ -27,6 +27,36 @@ describe LogicalQueryParser do
       expect(result).to match sequence %w|title aa\ bb OR body aa\ bb|
       expect(Doc.where(result).to_a).not_to be_nil
     end
+
+    ['and', 'or', 'not'].each do |ope|
+      it "parses word ending with #{ope}" do
+        result = parser.parse("xx#{ope}").to_sql(options)
+        debug(result)
+        expect(result).to match sequence %W|title xx#{ope} OR body xx#{ope}|
+        expect(Doc.where(result).to_a).not_to be_nil
+      end
+
+      it "parses word starting with #{ope}" do
+        result = parser.parse("#{ope}xx").to_sql(options)
+        debug(result)
+        expect(result).to match sequence %W|title #{ope}xx OR body #{ope}xx|
+        expect(Doc.where(result).to_a).not_to be_nil
+      end
+
+      it "parses word with #{ope} in the middle" do
+        result = parser.parse("xx#{ope}yy").to_sql(options)
+        debug(result)
+        expect(result).to match sequence %W|title xx#{ope}yy OR body xx#{ope}yy|
+        expect(Doc.where(result).to_a).not_to be_nil
+      end
+    end
+
+    it "parses word with - in the middle" do
+      result = parser.parse("xx-yy").to_sql(options)
+      debug(result)
+      expect(result).to match sequence %W|title xx-yy OR body xx-yy|
+      expect(Doc.where(result).to_a).not_to be_nil
+    end
   end
 
   ['NOT ', '- ', '-'].each do |ope|
