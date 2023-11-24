@@ -38,6 +38,8 @@ def debug(str)
 end
 
 def sequence(strs)
-  strs.map! { |s| Regexp.escape(s) }
-  Regexp.new(strs.join('.*'))
+  strs.map! do |s|
+    Regexp.escape(s)
+  end
+  Regexp.new(strs.join('[^()]*'))
 end
