@@ -1,6 +1,10 @@
 # CHANGELOG
 
-# 0.3.2
+## 0.3.3
+
+* Fix parsing literals which contains a logical operator. (#7 by scambra)
+
+## 0.3.2
 
 * Force text search for activerecord's serialized column.
 
