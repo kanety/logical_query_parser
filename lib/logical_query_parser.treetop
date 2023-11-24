@@ -28,7 +28,7 @@ grammar LogicalQueryParser
   end
 
   rule unquoted_word
-    [^\s*()]+ !{ |word| %w[AND and && & OR or || | NOT not - - －].include? word[0].text_value }
+    !ope atom+ / ope atom+
   end
 
   rule lparen
@@ -51,6 +51,10 @@ grammar LogicalQueryParser
     (not_ope sp+ / not_sym sp*) <NotNode>
   end
 
+  rule ope
+    and_ope / or_ope / not_ope
+  end
+
   rule and_ope
     'AND' / 'and' / '&&' / '&'
   end
@@ -69,5 +73,9 @@ grammar LogicalQueryParser
 
   rule sp
     ' ' / '　'
+  end
+
+  rule atom
+    !(lparen / rparen / sp) .
   end
 end
