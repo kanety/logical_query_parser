@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.3.4
+
+* Just rebuild gem file to fix file permission.
+
 ## 0.3.3
 
 * Fix parsing literals which contains a logical operator. (#7 by scambra)
