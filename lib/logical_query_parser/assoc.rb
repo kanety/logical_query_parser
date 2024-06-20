@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LogicalQueryParser
   class Assoc
     attr_accessor :column_mapping, :structure

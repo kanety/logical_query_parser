@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module LogicalQueryParser
   module ExpNode
     def to_sql(params = {})
-      params[:sql] ||= ''
+      params[:sql] ||= ''.dup
       exp.to_sql(params)
     end
   end

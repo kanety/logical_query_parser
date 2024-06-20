@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'treetop'
 Treetop.load File.expand_path("../logical_query_parser.treetop", __FILE__)
 
