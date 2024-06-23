@@ -3,7 +3,7 @@
 module LogicalQueryParser
   module ExpNode
     def to_sql(params = {})
-      params[:sql] ||= ''.dup
+      params[:_sql] ||= ''.dup
       exp.to_sql(params)
     end
   end
@@ -17,10 +17,10 @@ module LogicalQueryParser
       exp.to_sql(params)
       rparen.to_sql(params)
       if rexp.elements.size > 0
-        params[:sql] += ' AND '
+        params[:_sql] += ' AND '
         rexp.elements[0].to_sql(params)
       end
-      params[:sql]
+      params[:_sql]
     end
   end
 
@@ -35,38 +35,38 @@ module LogicalQueryParser
   module LiteralExpNode
     def to_sql(params)
       literal.to_sql(params)
-      params[:sql] << ' AND '
+      params[:_sql] << ' AND '
       exp.to_sql(params)
     end
   end
 
   module LParenNode
     def to_sql(params)
-      params[:sql] << '('
+      params[:_sql] << '('
     end
   end
 
   module RParenNode
     def to_sql(params)
-      params[:sql] << ')'
+      params[:_sql] << ')'
     end
   end
 
   module AndNode
     def to_sql(params)
-      params[:sql] << ' AND '
+      params[:_sql] << ' AND '
     end
   end
 
   module OrNode
     def to_sql(params)
-      params[:sql] << ' OR '
+      params[:_sql] << ' OR '
     end
   end
 
   module NotNode
     def to_sql(params)
-      params[:sql] << 'NOT '
+      params[:_sql] << 'NOT '
     end
   end
 
@@ -77,7 +77,7 @@ module LogicalQueryParser
       
       sql = build_arel(params, operator, text).reduce(logic).to_sql
       sql = "(#{sql})" if sql[0] != '(' && sql[-1] != ')'
-      params[:sql] << sql
+      params[:_sql] << sql
     end
 
     private
