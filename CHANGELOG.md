@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.4.0
+
+* Add `frozen_string_literal: true`.
+* Fix internal hash key for building sql.
+
 ## 0.3.4
 
 * Just rebuild gem file to fix file permission.
