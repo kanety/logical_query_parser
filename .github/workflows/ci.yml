@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         ruby: [2.3, 2.4, 2.5, 2.6, 2.7, '3.0', 3.1, 3.2, 3.3]
-        gemfile: ['rails42', 'rails50', 'rails51', 'rails52', 'rails60', 'rails61', 'rails70', 'rails71']
+        gemfile: ['rails42', 'rails50', 'rails51', 'rails52', 'rails60', 'rails61', 'rails70', 'rails71', 'rails72']
         exclude:
           - ruby: 2.3
             gemfile: rails60
@@ -19,6 +19,8 @@ jobs:
             gemfile: rails70
           - ruby: 2.3
             gemfile: rails71
+          - ruby: 2.3
+            gemfile: rails72
           - ruby: 2.4
             gemfile: rails60
           - ruby: 2.4
@@ -27,16 +29,24 @@ jobs:
             gemfile: rails70
           - ruby: 2.4
             gemfile: rails71
+          - ruby: 2.4
+            gemfile: rails72
           - ruby: 2.5
             gemfile: rails70
           - ruby: 2.5
             gemfile: rails71
+          - ruby: 2.5
+            gemfile: rails72
           - ruby: 2.6
             gemfile: rails70
           - ruby: 2.6
             gemfile: rails71
+          - ruby: 2.6
+            gemfile: rails72
           - ruby: 2.7
             gemfile: rails42
+          - ruby: 2.7
+            gemfile: rails72
           - ruby: 3.0
             gemfile: rails42
           - ruby: 3.0
@@ -45,6 +55,8 @@ jobs:
             gemfile: rails51
           - ruby: 3.0
             gemfile: rails52
+          - ruby: 3.0
+            gemfile: rails72
           - ruby: 3.1
             gemfile: rails42
           - ruby: 3.1
