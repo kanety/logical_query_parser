@@ -14,10 +14,11 @@ module LogicalQueryParser
       LogicalQueryParserParser.new
     end
 
-    def search(query, relations, *options)
+    def search(query, relations, *args, parser: new, **options)
       relations = relations.all if relations.respond_to?(:all)
-      assoc = resolve_assocs(relations.klass, *options)
-      sql = new.parse(query).to_sql(model: relations.klass, columns: assoc.column_mapping)
+      args << options if options.any?
+      assoc = resolve_assocs(relations.klass, *args)
+      sql = parser.parse(query).to_sql(model: relations.klass, columns: assoc.column_mapping)
       relations.joins(assoc.structure).where(sql)
     end
 
