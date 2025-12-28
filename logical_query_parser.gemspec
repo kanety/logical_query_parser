@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "treetop", "~> 1.6.8"
 
   spec.add_development_dependency "bundler"
+  spec.add_development_dependency "irb"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "simplecov"
