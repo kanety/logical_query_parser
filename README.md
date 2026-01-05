@@ -4,9 +4,9 @@ A parser to generate a tree structure from a logical search query string using t
 
 ## Dependencies
 
-* ruby 2.3+
+* ruby 3.0+
 * treetop 1.6+
-* activerecord 4.2+ (optional)
+* activerecord 7.0+ (optional)
 
 ## Installation
 
