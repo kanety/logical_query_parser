@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.5.0
+
+* Drop support for ruby <= 2.7, rails <= 6.1.
+
 ## 0.4.0
 
 * Add `frozen_string_literal: true`.
