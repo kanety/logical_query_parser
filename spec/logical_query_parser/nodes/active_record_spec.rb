@@ -213,4 +213,34 @@ describe LogicalQueryParser do
       expect(relations.to_a).not_to be_nil
     end
   end
+
+  context 'search with parser' do
+    it 'searches' do
+      relations = LogicalQueryParser.search("aa AND bb", Doc, :title, :body, parser: LogicalQueryParserParser.new)
+      debug(relations.to_sql)
+      expect(relations.to_sql).to match sequence %W|( ( title aa OR body aa ) AND ( title bb OR body bb )|
+      expect(relations.to_a).not_to be_nil
+    end
+
+    it 'searches one association' do
+      relations = LogicalQueryParser.search("aa AND bb", Doc, :title, { tags: :name }, parser: LogicalQueryParserParser.new)
+      debug(relations.to_sql)
+      expect(relations.to_sql).to match sequence %W|( ( title aa OR tags name aa ) AND ( title bb OR tags name bb )|
+      expect(relations.to_a).not_to be_nil
+    end
+
+    it 'searches nested association' do
+      relations = LogicalQueryParser.search("aa AND bb", Doc, :title, tags: [:name, users: :name], parser: LogicalQueryParserParser.new)
+      debug(relations.to_sql)
+      expect(relations.to_sql).to match sequence %W|( ( ( title aa OR tags name aa ) OR users name aa ) AND ( ( title bb OR tags name bb ) OR users name bb )|
+      expect(relations.to_a).not_to be_nil
+    end
+
+    it 'searches nested association with array' do
+      relations = LogicalQueryParser.search("aa AND bb", Doc, [:title, tags: [:name, users: :name]], parser: LogicalQueryParserParser.new)
+      debug(relations.to_sql)
+      expect(relations.to_sql).to match sequence %W|( ( ( title aa OR tags name aa ) OR users name aa ) AND ( ( title bb OR tags name bb ) OR users name bb )|
+      expect(relations.to_a).not_to be_nil
+    end
+  end
 end
