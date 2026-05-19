@@ -16,6 +16,11 @@ ActiveRecord::Schema.define do
     t.string :name
   end
 
+  create_table :flags, force: true do |t|
+    t.references :doc
+    t.string :name
+  end
+
   create_table :users, force: true do |t|
     t.references :tag
     t.string :name
@@ -24,10 +29,17 @@ end
 
 class Doc < ActiveRecord::Base
   has_many :tags
+  has_many :flags
 end
 
 class Tag < ActiveRecord::Base
   has_many :users
+  belongs_to :doc
+end
+
+class Flag < ActiveRecord::Base
+  has_many :tags
+  belongs_to :doc
 end
 
 class User < ActiveRecord::Base

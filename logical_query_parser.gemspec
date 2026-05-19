@@ -23,6 +23,8 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "treetop", "~> 1.6.8"
 
+  spec.add_development_dependency "activerecord", ">= 7.0"
+  spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "irb"
   spec.add_development_dependency "rake"

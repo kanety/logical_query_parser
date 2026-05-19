@@ -75,7 +75,7 @@ module LogicalQueryParser
       operator, logic = operator_and_logic
       text = LogicalQueryParser.unquote(word.text_value)
       
-      sql = build_arel(params, operator, text).reduce(logic).to_sql
+      sql = build_arel(params[:root], operator, text).reduce(logic).to_sql
       sql = "(#{sql})" if sql[0] != '(' && sql[-1] != ')'
       params[:_sql] << sql
     end
@@ -90,21 +90,12 @@ module LogicalQueryParser
       end
     end
 
-    def build_arel(params, operator, text)
-      if params[:columns].is_a?(Hash)
-        build_arel_from_hash(params[:model], params[:columns], operator, text)
-      else
-        build_arel_from_columns(params[:model], params[:columns], operator, text)
-      end
-    end
-    
-    def build_arel_from_columns(klass, columns, operator, text)
-      columns.map { |column| klass.arel_table[column].send(operator, Arel.sql(klass.connection.quote("%#{text}%"))) }
-    end
-
-    def build_arel_from_hash(klass, hash, operator, text)
-      hash.flat_map do |klass, columns|
-        build_arel_from_columns(klass, columns, operator, text)
+    def build_arel(root, operator, text)
+      assocs = [root] + root.descendants
+      assocs.flat_map do |assoc|
+        assoc.columns.map do |column|
+          assoc.arel_table[column].send(operator, Arel.sql(assoc.klass.connection.quote("%#{text}%")))
+        end
       end
     end
   end

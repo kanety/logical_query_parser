@@ -1,18 +1,25 @@
 # frozen_string_literal: true
 
-require_relative 'assoc'
+require_relative 'assoc_node'
 
 module LogicalQueryParser
   class AssocResolver
-    def initialize(klass)
-      @klass = klass
+    def initialize(relation, *options)
+      @relation = relation
+      @options = options.flatten(1)
     end
 
-    def run(*args)
-      Assoc.new.tap do |assoc|
-        assoc.current = assoc.structure
-        resolve_assocs(@klass, args, assoc)
+    def call
+      root_node = AssocNode.new(klass: @relation.klass, table_name: @relation.table_name)
+      resolve_assocs(@relation.klass, root_node, @options)
+
+      join_relation = @relation.klass.unscoped.joins(root_node.join_structure)
+      root_node.descendants.each_with_index do |node, i|
+        join_source = join_relation.arel.join_sources[i]
+        node.table_name = join_source&.left&.name || node.klass.table_name
       end
+
+      root_node
     end
 
     private
@@ -25,24 +32,20 @@ module LogicalQueryParser
       end
     end
 
-    def resolve_assocs(klass, options, assoc)
-      options = wrap_array(options)
-      options.each do |option|
-        if option.is_a?(Hash)
-          resolve_assocs_for_hash(klass, option, assoc)
+    def resolve_assocs(current_klass, node, options)
+      wrap_array(options).each do |column_or_assoc_hash|
+        if column_or_assoc_hash.is_a?(Hash)
+          column_or_assoc_hash.each do |assoc_name, nested_column_or_assoc_hash|
+            if (reflection = current_klass.reflect_on_association(assoc_name))
+              child = AssocNode.new(klass: reflection.klass, assoc_name: assoc_name, parent: node)
+              node.children ||= []
+              node.children << child
+              resolve_assocs(reflection.klass, child, nested_column_or_assoc_hash)
+            end
+          end
         else
-          assoc.column_mapping[klass] ||= []
-          assoc.column_mapping[klass] << option
-        end
-      end
-    end
-
-    def resolve_assocs_for_hash(klass, hash, assoc)
-      hash.each do |assoc_name, options|
-        if (reflection = klass.reflect_on_association(assoc_name))
-          assoc.current[assoc_name] = {}
-          assoc.current = assoc.current[assoc_name]
-          resolve_assocs(reflection.klass, options, assoc)
+          node.columns ||= []
+          node.columns << column_or_assoc_hash
         end
       end
     end
