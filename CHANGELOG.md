@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.6.0
+
+* Support multiple associations and alias table names for `search` method.
+* Change join method from `joins` to `left_joins` for `search` method.
+
 ## 0.5.0
 
 * Drop support for ruby <= 2.7, rails <= 6.1.
