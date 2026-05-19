@@ -112,21 +112,21 @@ end
 
 LogicalQueryParser.search("a AND b", Doc.all, :c1, :c2, tags: [:c3]).to_sql
 # SELECT "docs".* FROM "docs"
-#  INNER JOIN "tags" ON "tags"."doc_id" = "docs"."id"
+#  LEFT OUTER JOIN "tags" ON "tags"."doc_id" = "docs"."id"
 #  WHERE ((("docs"."c1" LIKE '%a%' OR "docs"."c2" LIKE '%a%') OR "tags"."c3" LIKE '%a%') AND
 #        (("docs"."c1" LIKE '%b%' OR "docs"."c2" LIKE '%b%') OR "tags"."c3" LIKE '%b%'))
 
 LogicalQueryParser.search("a AND b", Doc.all, :c1, :c2, tags: [:c3], flags: [:c4]).to_sql
 # SELECT "docs".* FROM "docs"
-#  INNER JOIN "tags" ON "tags"."doc_id" = "docs"."id"
-#  INNER JOIN "flags" ON "flags"."doc_id" = "docs"."id"
+#  LEFT OUTER JOIN "tags" ON "tags"."doc_id" = "docs"."id"
+#  LEFT OUTER JOIN "flags" ON "flags"."doc_id" = "docs"."id"
 #  WHERE (((("docs"."c1" LIKE '%a%' OR "docs"."c2" LIKE '%a%') OR "tags"."c3" LIKE '%a%') OR "flags"."c4" LIKE '%a%') AND 
 #        ((("docs"."c1" LIKE '%b%' OR "docs"."c2" LIKE '%b%') OR "tags"."c3" LIKE '%b%') OR "flags"."c4" LIKE '%b%'))
 
 LogicalQueryParser.search("a AND b", Doc.all, :c1, tags: [:c2, doc: [:c3]]).to_sql
 # SELECT "docs".* FROM "docs"
-#  INNER JOIN "tags" ON "tags"."doc_id" = "docs"."id"
-#  INNER JOIN "docs" AS "docs_tags" ON "docs_tags"."id" = "tags"."doc_id"
+#  LEFT OUTER JOIN "tags" ON "tags"."doc_id" = "docs"."id"
+#  LEFT OUTER JOIN "docs" AS "docs_tags" ON "docs_tags"."id" = "tags"."doc_id"
 #  WHERE ((("docs"."c1" LIKE '%a%' OR "tags"."c2" LIKE '%a%') OR "docs_tags"."c3" LIKE '%a%') AND
 #        (("docs"."c1" LIKE '%b%' OR "tags"."c2" LIKE '%b%') OR "docs_tags"."c3" LIKE '%b%'))
 ```

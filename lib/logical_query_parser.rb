@@ -18,7 +18,7 @@ module LogicalQueryParser
       relations = relations.all if relations.respond_to?(:all)
       root = resolve_assocs(relations, *options)
       sql = new.parse(query).to_sql(root: root)
-      relations = relations.joins(root.join_structure) unless root.join_structure.empty?
+      relations = relations.left_joins(root.join_structure) unless root.join_structure.empty?
       relations.where(sql)
     end
 

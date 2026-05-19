@@ -13,7 +13,7 @@ module LogicalQueryParser
       root_node = AssocNode.new(klass: @relation.klass, table_name: @relation.table_name)
       resolve_assocs(@relation.klass, root_node, @options)
 
-      join_relation = @relation.klass.unscoped.joins(root_node.join_structure)
+      join_relation = @relation.klass.unscoped.left_joins(root_node.join_structure)
       root_node.descendants.each_with_index do |node, i|
         join_source = join_relation.arel.join_sources[i]
         node.table_name = join_source&.left&.name || node.klass.table_name
