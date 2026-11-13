@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'logical_query_parser/db_adapters'
+
 module LogicalQueryParser
   module ExpNode
     def to_sql(params = {})
@@ -94,9 +96,34 @@ module LogicalQueryParser
       assocs = [root] + root.descendants
       assocs.flat_map do |assoc|
         assoc.columns.map do |column|
-          assoc.arel_table[column].send(operator, Arel.sql(assoc.klass.connection.quote("%#{text}%")))
+          if column.to_s.include?('->')
+            arel = build_json_arel(assoc, column)
+          else
+            arel = build_text_arel(assoc, column)
+          end
+          arel.send(operator, Arel.sql(assoc.klass.connection.quote("%#{text}%")))
         end
       end
+    end
+
+    def build_text_arel(assoc, column)
+      connection = assoc.klass.connection
+      arel = assoc.arel_table[column]
+      arel = DbAdapters.resolve(connection).cast_to_text(arel) unless text_column?(assoc, column)
+      arel
+    end
+
+    def build_json_arel(assoc, column_and_keys)
+      connection = assoc.klass.connection
+      column, *keys = column_and_keys.to_s.split('->', -1)
+
+      arel = assoc.arel_table[column]
+      adapter = DbAdapters.resolve(connection)
+      adapter.cast_to_text(adapter.json_extract(arel, keys))
+    end
+
+    def text_column?(assoc, column)
+      [:string, :text].include?(assoc.klass.columns_hash[column.to_s].type)
     end
   end
 

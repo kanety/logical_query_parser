@@ -131,6 +131,17 @@ LogicalQueryParser.search("a AND b", Doc.all, :c1, tags: [:c2, doc: [:c3]]).to_s
 #        (("docs"."c1" LIKE '%b%' OR "tags"."c2" LIKE '%b%') OR "docs_tags"."c3" LIKE '%b%'))
 ```
 
+#### JSON paths
+
+Use `->` to specify JSON object keys:
+
+```ruby
+LogicalQueryParser.search('a AND b', Doc.all, :title, 'data->address->city')
+# SELECT "docs".* FROM "docs"
+#  WHERE (("docs"."title" LIKE '%a%' OR CAST(JSON_EXTRACT("docs"."data", '$."key1"."key2"') AS TEXT) LIKE '%a%') AND 
+#         ("docs"."title" LIKE '%b%' OR CAST(JSON_EXTRACT("docs"."data", '$."key1"."key2"') AS TEXT) LIKE '%b%'))
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/kanety/logical_query_parser.

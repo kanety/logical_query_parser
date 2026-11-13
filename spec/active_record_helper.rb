@@ -1,30 +1,39 @@
 require 'active_record'
 
-ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+ActiveRecord::Base.establish_connection(
+  ENV.fetch('DATABASE_URL') { { adapter: 'sqlite3', database: ':memory:' } }
+)
 
-ActiveRecord::Schema.define do
-  self.verbose = false
+json_column_type = case ActiveRecord::Base.connection.adapter_name
+                   when 'PostgreSQL', 'PostGIS' then :jsonb
+                   when 'Mysql2', 'Trilogy' then :json
+                   else :text
+                   end
 
-  create_table :docs, force: true do |t|
-    t.string :title
-    t.string :body
-    t.timestamps null: false
-  end
+connection = ActiveRecord::Base.connection
 
-  create_table :tags, force: true do |t|
-    t.references :doc
-    t.string :name
-  end
+connection.create_table :docs, temporary: true do |t|
+  t.string :title
+  t.string :body
+  t.integer :rank
+  t.column :data, json_column_type
+  t.timestamps null: false
+end
 
-  create_table :flags, force: true do |t|
-    t.references :doc
-    t.string :name
-  end
+connection.create_table :tags, temporary: true do |t|
+  t.references :doc
+  t.string :name
+  t.column :data, json_column_type
+end
 
-  create_table :users, force: true do |t|
-    t.references :tag
-    t.string :name
-  end
+connection.create_table :flags, temporary: true do |t|
+  t.references :doc
+  t.string :name
+end
+
+connection.create_table :users, temporary: true do |t|
+  t.references :tag
+  t.string :name
 end
 
 class Doc < ActiveRecord::Base
